@@ -8,6 +8,11 @@ pub mod plztakedown {
     pub fn initialize(ctx: Context<Initialize>) -> ProgramResult {
         Ok(())
     }
+
+    pub fn read_website(ctx: Context<SetData>) -> Result<()> {
+        
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
