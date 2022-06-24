@@ -2,13 +2,15 @@ from solcx import install_solc
 install_solc(version='latest')
 
 from web3 import Web3
-
+from web3.middleware import geth_poa_middleware
 from solcx import compile_source
 
-contents = open("Storage.sol").read()
+contract_contents = open("Storage.sol").read()
+private_key = open("private-key").read()
+
 # Solidity source code
 compiled_sol = compile_source(
-    contents,
+    contract_contents,
     output_values=['abi', 'bin']
 )
 
@@ -22,10 +24,14 @@ bytecode = contract_interface['bin']
 abi = contract_interface['abi']
 
 # web3.py instance
-w3 = Web3(Web3.EthereumTesterProvider())
+# w3 = Web3(Web3.EthereumTesterProvider())
+w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 # set pre-funded account as sender
-w3.eth.default_account = w3.eth.accounts[0]
+account = w3.eth.account.privateKeyToAccount(private_key)
+w3.eth.default_account = account.address
+print(account.address)
 
 Storage = w3.eth.contract(abi=abi, bytecode=bytecode)
 
